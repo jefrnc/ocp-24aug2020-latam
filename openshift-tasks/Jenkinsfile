@@ -149,16 +149,17 @@ pipeline {
                 openshift.selector("dc", "tasks").rollout().latest(); //Vuelva a implementar la implementación de desarrollo
 
                 // Espere hasta que se ejecute la implementación
-                
+                //Todo: revisar
                 def otaskdc = openshift.selector("dc", "tasks").object()
                 def otaskdc_version = otaskdc.status.latestVersion
                 def otaskrc = openshift.selector("rc", "tasks-${otaskdc_version}").object()
 
                 echo "Waiting rc tasks-${otaskdc_version} to be ready"
-                while (otaskrc.status.readyReplicas < 1 ) {
+                //(otaskrc.spec.replicas != otaskrc.status.readyReplicas)
+                /*while (otaskrc.status.readyReplicas < 1 ) {
                   sleep 30
                   rc = openshift.selector("rc", "tasks-${otaskdc_version}").object()
-                } 
+                } */
 
 
               }
@@ -193,15 +194,39 @@ pipeline {
     stage('Blue/Green Production Deployment') {
       steps {
         echo "Blue/Green Production Deployment"
-        /*script {
+        script {
+          openshift.withCluster() {
+            openshift.withProject("${prodProject}") {
+              activeApp = openshift.selector("route", "tasks").object().spec.to.name
+              if (activeApp == "tasks-green") {
+                destApp = "tasks-blue"
+              }
+              echo "Active Application:      " + activeApp
+              echo "Destination Application: " + destApp
 
-          // TBD: Determine which application is active
-          //      Set Image, Set VERSION
-          //      (Re-)create ConfigMap
-          //      Deploy into the other application
-          //      Make sure the application is running and ready before proceeding
+              def dc = openshift.selector("dc/${destApp}").object() //Actualizar la imagen en la configuración de implementación de producción
+              dc.spec.template.spec.containers[0].image="image-registry.openshift-image-registry.svc:5000/${devProject}/${GUID}-tasks:${prodTag}"
 
-        }*/
+               
+              openshift.apply(dc) //Aplicamos el cambio
+
+              openshift.selector('configmap', "${destApp}-config").delete() //Actualizamos el ConfigMap
+              def configmap = openshift.create("configmap", "${destApp}-config", "--from-file=./openshift-tasks/configuration/application-users.properties", "--from-file=./openshift-tasks/configuration/application-roles.properties")
+
+              openshift.selector("dc", "${destApp}").rollout().latest();
+
+              def dc_prod = openshift.selector("dc", "${destApp}").object()
+              def dc_version = dc_prod.status.latestVersion
+              def rc_prod = openshift.selector("rc", "${destApp}-${dc_version}").object()
+              echo "Waiting for ${destApp} to be ready"
+              //Todo: revisar
+              /*while (rc_prod.status.readyReplicas < 1) {
+                sleep 5
+                rc_prod = openshift.selector("rc", "${destApp}-${dc_version}").object()
+              }*/
+            }
+          }
+        }
       }
     }
 
