@@ -59,18 +59,18 @@ oc create secret generic gitea-secret --from-literal=username=jose.franco-semper
 
 echo "apiVersion: v1
 items:
-- kind: "BuildConfig"
-  apiVersion: "v1"
+- kind: ""BuildConfig""
+  apiVersion: ""v1""
   metadata:
-    name: "tasks-pipeline"
+    name: ""tasks-pipeline""
   spec:
     source:
-      type: "Git"
+      type: ""Git""
       git:
         uri: ${REPO}
-      contextDir: "openshift-tasks"
+      contextDir: ""openshift-tasks""
     strategy:
-      type: "JenkinsPipeline"
+      type: ""JenkinsPipeline""
       jenkinsPipelineStrategy:
         jenkinsfilePath: Jenkinsfile
 kind: List
