@@ -147,10 +147,20 @@ pipeline {
                 def configmap = openshift.create('configmap', 'tasks-config', '--from-file=./configuration/application-users.properties', '--from-file=./configuration/application-roles.properties') //Actualice los mapas de configuración con los archivos de propiedades potencialmente modificados
 
                 openshift.selector("dc", "tasks").rollout().latest(); //Vuelva a implementar la implementación de desarrollo
+
+                // Espere hasta que se ejecute la implementación
  
-                openshiftDeploy depCfg: 'tasks', namespace: '${GUID}-tasks-dev', verbose: 'false', waitTime: '', waitUnit: 'sec'
-                openshiftVerifyDeployment depCfg: 'tasks', namespace: '${GUID}-tasks-dev', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '', waitUnit: 'sec'
-                openshiftVerifyService namespace: '${GUID}-tasks-dev', svcName: 'tasks', verbose: 'false'
+  
+                def otaskdc = openshift.selector("dc", "tasks").object()
+                def latestDeploymentVersion = otaskdc.status.latestVersion
+                def rc = openshift.selector('rc', "${APP_NAME}-${latestDeploymentVersion}")
+                echo "Waiting rc tasks-${otaskdc_version} to be ready"
+                rc.untilEach(1){
+                  sleep 30
+                  def rcMap = it.object()
+                  return (rcMap.status.replicas.equals(rcMap.status.readyReplicas))
+                }
+
 
               }
             }
