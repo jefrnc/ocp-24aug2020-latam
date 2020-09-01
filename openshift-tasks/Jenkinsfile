@@ -131,22 +131,39 @@ pipeline {
         }
       }
     }
+
     // Deploy the built image to the Development Environment.
     stage('Deploy to Dev') {
       steps {
         dir('openshift-tasks') {
           echo "Deploying container image to Development Project"
-          /*script {
+          script {
+            openshift.withCluster() {        
+              openshift.withProject("${devProject}") {
+                 
+                openshift.set("image", "dc/tasks", "tasks=image-registry.openshift-image-registry.svc:5000/${devProject}/${imageName}:${devTag}") // Actualizar la imagen en la configuración de implementación de desarrollo
 
-            // TBD: Deploy to development Project
-            //      Set Image, Set VERSION
-            //      (Re-) Create ConfigMap
-            //      Make sure the application is running and ready before proceeding
+                openshift.selector('configmap', 'tasks-config').delete() //Borramos
+                def configmap = openshift.create('configmap', 'tasks-config', '--from-file=./configuration/application-users.properties', '--from-file=./configuration/application-roles.properties') //Actualice los mapas de configuración con los archivos de propiedades potencialmente modificados
 
-          }*/
+                openshift.selector("dc", "tasks").rollout().latest(); //Vuelva a implementar la implementación de desarrollo
+
+                // Espere hasta que se ejecute la implementación
+                def otaskdc = openshift.selector("dc", "tasks").object()
+                def otaskdc_version = otaskdc.status.latestVersion
+                def otaskrc = openshift.selector("rc", "tasks-${otaskdc_version}").object()
+
+                echo "Waiting rc tasks-${otaskdc_version} to be ready"
+                while (otaskrc.spec.replicas != otaskrc.status.readyReplicas) {
+                  sleep 10
+                  rc = openshift.selector("rc", "tasks-${otaskdc_version}").object()
+                }
+              }
+            }
+          }
         }
       }
-    }
+    }    
 
     // Copy Image to Nexus Container Registry
     stage('Copy Image to Nexus Container Registry') {
