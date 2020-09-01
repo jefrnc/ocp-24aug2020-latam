@@ -31,7 +31,7 @@ while (true); do
   sleep 10
 done
 
-
+ 
 # Create custom agent container image with skopeo.
 # Build config must be called 'jenkins-agent-appdev' for the test below to succeed
 
@@ -81,8 +81,8 @@ oc set build-secret --source bc/tasks-pipeline gitea-secret -n ${GUID}-jenkins
 
 # Set up ConfigMap with Jenkins Agent definition
 #oc create -f ./manifests/agent-cm.yaml -n ${GUID}-jenkins
-cat ./manifests/agent-cm.yaml | sed  "s/GUID/${GUID}/g" | oc create -f - -n ${GUID}-jenkins
-
+#cat ./manifests/agent-cm.yaml | sed  "s/GUID/${GUID}/g" | oc create -f - -n ${GUID}-jenkins
+oc create -f ./manifests/agent-cm.yaml  -n ${GUID}-jenkins
 
 # ========================================
 # No changes are necessary below this line
