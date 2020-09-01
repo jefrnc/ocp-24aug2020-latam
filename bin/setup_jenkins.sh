@@ -35,14 +35,16 @@ done
 # Create custom agent container image with skopeo.
 # Build config must be called 'jenkins-agent-appdev' for the test below to succeed
 
+oc new-build --strategy=docker -D $'FROM quay.io/openshift/origin-jenkins-agent-maven:4.1.0\n
+   USER root\n
+   RUN curl https://copr.fedorainfracloud.org/coprs/alsadi/dumb-init/repo/epel-7/alsadi-dumb-init-epel-7.repo -o /etc/yum.repos.d/alsadi-dumb-init-epel-7.repo && \ \n
+   curl https://raw.githubusercontent.com/cloudrouter/centos-repo/master/CentOS-Base.repo -o /etc/yum.repos.d/CentOS-Base.repo && \ \n
+   curl http://mirror.centos.org/centos-7/7/os/x86_64/RPM-GPG-KEY-CentOS-7 -o /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \ \n
+   DISABLES="--disablerepo=rhel-server-extras --disablerepo=rhel-server --disablerepo=rhel-fast-datapath --disablerepo=rhel-server-optional --disablerepo=rhel-server-ose --disablerepo=rhel-server-rhscl" && \ \n
+   yum $DISABLES -y --setopt=tsflags=nodocs install skopeo && yum clean all\n
+   USER 1001' --name=jenkins-agent-appdev -n ${GUID}-jenkins
 
-ocpbuilds=$(oc get build | grep -c "jenkins-agent-appdev.*Complete")
-if [[ $ocpbuilds -eq 0 ]]; then
-    export JENKINS_AGENT=jenkins-agent-appdev
-      oc new-build  -D $'FROM docker.io/openshift/jenkins-agent-maven-35-centos7:v3.11\n
-        USER root\nRUN yum -y install skopeo && yum clean all\n
-        USER 1001' --name=jenkins-agent-appdev -n ${GUID}-jenkins
-fi
+
 
 
 # Create Secret with credentials to access the private repository
@@ -78,7 +80,9 @@ spec:
 oc set build-secret --source bc/tasks-pipeline gitea-secret -n ${GUID}-jenkins
 
 # Set up ConfigMap with Jenkins Agent definition
-oc create -f ./manifests/agent-cm.yaml -n ${GUID}-jenkins
+#oc create -f ./manifests/agent-cm.yaml -n ${GUID}-jenkins
+cat ./manifests/agent-cm.yaml | sed  "s/GUID/${GUID}/g" | oc create -f - -n ${GUID}-jenkins
+
 
 # ========================================
 # No changes are necessary below this line

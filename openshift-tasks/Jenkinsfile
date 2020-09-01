@@ -95,7 +95,7 @@ pipeline {
           script {
             echo "Running Code Analysis"
             sh "${mvnCmd} sonar:sonar \
-                          -Dsonar.host.url=http://homework-sonarqube.apps.shared.na.openshift.opentlc.com/ \
+                          -Dsonar.host.url=http://homework-sonarqube.apps.shared-na4.na4.openshift.opentlc.com/ \
                           -Dsonar.projectName=${GUID}-${JOB_BASE_NAME}-${devTag} \
                           -Dsonar.projectVersion=${devTag}"
 
