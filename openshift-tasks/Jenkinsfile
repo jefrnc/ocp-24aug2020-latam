@@ -155,11 +155,15 @@ pipeline {
                 def otaskrc = openshift.selector("rc", "tasks-${otaskdc_version}").object()
 
                 echo "Waiting rc tasks-${otaskdc_version} to be ready"
+                echo "spec.replicas = ${otaskrc.spec.replicas}"
+                echo "otaskrc.status.readyReplicas = ${otaskrc.status.readyReplicas}"
                 //(otaskrc.spec.replicas != otaskrc.status.readyReplicas)
-                /*while (otaskrc.status.readyReplicas < 1 ) {
+                while (otaskrc.spec.replicas != otaskrc.status.readyReplicas) {
                   sleep 30
                   rc = openshift.selector("rc", "tasks-${otaskdc_version}").object()
-                } */
+                  echo "spec.replicas = ${otaskrc.spec.replicas}"
+                  echo "otaskrc.status.readyReplicas = ${otaskrc.status.readyReplicas}"
+                } 
 
 
               }
