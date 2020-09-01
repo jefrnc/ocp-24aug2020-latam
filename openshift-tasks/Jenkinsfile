@@ -155,6 +155,7 @@ pipeline {
     // -------------------------------------
     stage('Blue/Green Production Deployment') {
       steps {
+        echo "Blue/Green Production Deployment"
         /*script {
 
           // TBD: Determine which application is active
