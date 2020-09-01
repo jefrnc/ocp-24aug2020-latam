@@ -57,28 +57,25 @@ oc create secret generic gitea-secret --from-literal=username=jose.franco-semper
 # Build config has to be called 'tasks-pipeline'.
 # Make sure you use your secret to access the repository
 
-echo "apiVersion: v1
-items:
-- kind: ""BuildConfig""
-  apiVersion: ""v1""
-  metadata:
-    name: ""tasks-pipeline""
-  spec:
-    source:
-      type: ""Git""
-      git:
-        uri: ${REPO}
-      contextDir: ""openshift-tasks""
-    strategy:
-      type: ""JenkinsPipeline""
-      jenkinsPipelineStrategy:
-        jenkinsfilePath: Jenkinsfile
-kind: List
-metadata: []" | oc create -f - -n ${GUID}-jenkins
-
+echo "kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  labels:
+    app: ocp-24aug2020-latam
+  name: tasks-pipeline
+spec:
+  source:
+    git:
+      ref: master
+      uri: \"${REPO}\"
+    contextDir: openshift-tasks/
+    type: Git
+  strategy:
+    type: \"JenkinsPipeline\"
+    jenkinsPipelineStrategy:
+        jenkinsfilePath: Jenkinsfile" | oc apply -f - -n ${GUID}-jenkins
 
 oc set build-secret --source bc/tasks-pipeline gitea-secret -n ${GUID}-jenkins
-
 
 # Set up ConfigMap with Jenkins Agent definition
 oc create -f ./manifests/agent-cm.yaml -n ${GUID}-jenkins

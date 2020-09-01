@@ -1,0 +1,17 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  labels:
+    app: ocp-24aug2020-latam
+  name: tasks-pipeline
+spec:
+  source:
+    git:
+      ref: master
+      uri: ${REPO}
+    contextDir: openshift-tasks/
+    type: Git
+  strategy:
+    type: "JenkinsPipeline"
+    jenkinsPipelineStrategy:
+        jenkinsfilePath: Jenkinsfile
