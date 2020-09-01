@@ -2,8 +2,8 @@ apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
   labels:
-    build: GUID-tasks
-  name: GUID-tasks
+    build: cec5-tasks
+  name: cec5-tasks
 spec:
   lookupPolicy:
     local: false
@@ -11,7 +11,7 @@ spec:
   - name: 0.0-0
     from:
       kind: DockerImage
-      name: image-registry.openshift-image-registry.svc:5000/GUID-tasks-dev/GUID-tasks:0.0-0
+      name: image-registry.openshift-image-registry.svc:5000/cec5-tasks-dev/cec5-tasks:0.0-0
     importPolicy: {}
     referencePolicy:
       type: Source
