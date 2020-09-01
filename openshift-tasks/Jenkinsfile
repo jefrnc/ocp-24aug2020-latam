@@ -111,12 +111,12 @@ pipeline {
         dir('openshift-tasks') {
           echo "Building OpenShift container image ${imageName}:${devTag} in project ${devProject}."
 
-          script {
+          /*script {
             // TBD: Build Image (binary build), tag Image
             //      Make sure the image name is correct in the tag!
 
 
-          }
+          }*/
         }
       }
     }
@@ -125,14 +125,14 @@ pipeline {
       steps {
         dir('openshift-tasks') {
           echo "Deploying container image to Development Project"
-          script {
+          /*script {
 
             // TBD: Deploy to development Project
             //      Set Image, Set VERSION
             //      (Re-) Create ConfigMap
             //      Make sure the application is running and ready before proceeding
 
-          }
+          }*/
         }
       }
     }
@@ -141,13 +141,13 @@ pipeline {
     stage('Copy Image to Nexus Container Registry') {
       steps {
         echo "Copy image to Nexus Container Registry"
-        script {
+       /* script {
 
           // TBD: Copy image to Nexus container registry
 
           // TBD: Tag the built image with the production tag.
 
-        }
+        }*/
       }
     }
 
@@ -155,7 +155,7 @@ pipeline {
     // -------------------------------------
     stage('Blue/Green Production Deployment') {
       steps {
-        script {
+        /*script {
 
           // TBD: Determine which application is active
           //      Set Image, Set VERSION
@@ -163,19 +163,19 @@ pipeline {
           //      Deploy into the other application
           //      Make sure the application is running and ready before proceeding
 
-        }
+        }*/
       }
     }
 
     stage('Switch over to new Version') {
       steps{
         echo "Switching Production application to ${destApp}."
-        script {
+        /*script {
           // TBD: Execute switch
           //      Hint: sleep 5 seconds after the switch
           //            for the route to be fully switched over
 
-        }
+        }*/
       }
     }
   }
