@@ -12,8 +12,6 @@ REPO=$2
 CLUSTER=$3
 echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cluster ${CLUSTER}"
 
-
- 
 # Set up Jenkins with sufficient resources
 # DO NOT FORGET TO PASS '-n ${GUID}-jenkins to ALL commands!!'
 # You do not want to set up things in the wrong project.
@@ -33,12 +31,10 @@ while (true); do
   sleep 10
 done
 
-#TODO: Test in OpenTLC Environment
 
 # Create custom agent container image with skopeo.
 # Build config must be called 'jenkins-agent-appdev' for the test below to succeed
 
- 
 
 ocpbuilds=$(oc get build | grep -c "jenkins-agent-appdev.*Complete")
 if [[ $ocpbuilds -eq 0 ]]; then
@@ -49,13 +45,10 @@ if [[ $ocpbuilds -eq 0 ]]; then
 fi
 
 
-
 # Create Secret with credentials to access the private repository
 # You may hardcode your user id and password here because
 # this shell scripts lives in a private repository
 # Passing it from Jenkins would show it in the Jenkins Log
-
-# TBD
 
 oc create secret generic gitea-secret --from-literal=username=jose.franco-semperti.com --from-literal=password=redhat123! -n ${GUID}-jenkins
 
@@ -63,8 +56,6 @@ oc create secret generic gitea-secret --from-literal=username=jose.franco-semper
 # Create pipeline build config pointing to the ${REPO} with contextDir `openshift-tasks`
 # Build config has to be called 'tasks-pipeline'.
 # Make sure you use your secret to access the repository
-
-# TBD ***
 
 echo "apiVersion: v1
 items:
@@ -87,8 +78,6 @@ metadata: []" | oc create -f - -n ${GUID}-jenkins
 
 
 oc set build-secret --source bc/tasks-pipeline gitea-secret -n ${GUID}-jenkins
-
-# *****
 
 
 # Set up ConfigMap with Jenkins Agent definition
