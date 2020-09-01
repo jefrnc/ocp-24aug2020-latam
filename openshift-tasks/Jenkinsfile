@@ -149,17 +149,22 @@ pipeline {
                 openshift.selector("dc", "tasks").rollout().latest(); //Vuelva a implementar la implementación de desarrollo
 
                 // Espere hasta que se ejecute la implementación
+                //Todo: revisar
  
   
                 def otaskdc = openshift.selector("dc", "tasks").object()
                 def latestDeploymentVersion = otaskdc.status.latestVersion
-                def rc = openshift.selector('rc', "${APP_NAME}-${latestDeploymentVersion}")
+                def rc = openshift.selector('rc', "tasks-${otaskdc_version}")
                 echo "Waiting rc tasks-${otaskdc_version} to be ready"
                 rc.untilEach(1){
                   sleep 30
                   def rcMap = it.object()
                   return (rcMap.status.replicas.equals(rcMap.status.readyReplicas))
                 }
+
+
+
+ 
 
 
               }
