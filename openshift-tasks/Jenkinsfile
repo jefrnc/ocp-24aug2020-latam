@@ -125,8 +125,8 @@ pipeline {
               openshift.withProject("${devProject}") {                
                 //openshift.selector("bc", "tasks").startBuild("--from-file=./target/openshift-tasks.war", "--wait=true")
                 //--follow
-                sh "oc start-build tasks   --from-file=./target/openshift-tasks.war -n ${GUID}-tasks-dev --loglevel=8"
-                //openshift.tag("${imageName}:latest", "${imageName}:${devTag}")
+                sh "oc start-build tasks --follow  --from-file=./target/openshift-tasks.war -n ${GUID}-tasks-dev --loglevel=8"
+                openshift.tag("${imageName}:latest", "${imageName}:${devTag}")
               }
             }
           }
