@@ -20,12 +20,12 @@ buffout=$(oc get dc jenkins --ignore-not-found=true -n ${GUID}-jenkins | grep -v
 
 echo "Start Jenkins..."
 if [[ -z ${buffout} ]];then 
-  oc new-app --name=jenkins --template=jenkins-persistent --param ENABLE_OAUTH=true --param VOLUME_CAPACITY=2Gi --param DISABLE_ADMINISTRATIVE_MONITORS=true -n ${GUID}-jenkins
+  oc new-app --name=jenkins --template=jenkins-persistent --param ENABLE_OAUTH=true --param VOLUME_CAPACITY=4Gi --param DISABLE_ADMINISTRATIVE_MONITORS=true -n ${GUID}-jenkins
 fi
 while (true); do 
   buffout=$(oc get dc jenkins -n ${GUID}-jenkins | grep -v NAME | awk '{print $1}')
   if [[ ! -z ${buffout} ]]; then
-    oc set resources dc jenkins --limits=memory=2Gi,cpu=2 --requests=memory=2Gi,cpu=1 -n ${GUID}-jenkins
+    oc set resources dc jenkins --limits=memory=4Gi,cpu=2 --requests=memory=2Gi,cpu=1 -n ${GUID}-jenkins
     break
   fi
   sleep 10
