@@ -30,7 +30,7 @@ spec:
         env:
         - name: VERSION
           value: 0.0 (tasks-green)
-        image: image-registry.openshift-image-registry.svc:5000/GUID-tasks-dev/GUID-tasks:0.0
+        image: image-registry.openshift-image-registry.svc:5000/cec5-tasks-dev/cec5-tasks:0.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
