@@ -122,8 +122,8 @@ pipeline {
           echo "Building OpenShift container image ${imageName}:${devTag} in project ${devProject}."
           script {
             openshift.withCluster() {
-              openshift.withProject("${devProject}") {
-                openshift.selector("bc", "tasks").startBuild("--from-file=./target/openshift-tasks.war", "--wait=true", "--server=https://api.shared-na4.na4.openshift.opentlc.com:6443")
+              openshift.withProject("${devProject}") {                
+                openshift.selector("bc", "tasks").startBuild("--from-file=./target/openshift-tasks.war", "--wait=true")
                 openshift.tag("${imageName}:latest", "${imageName}:${devTag}")
               }
             }
